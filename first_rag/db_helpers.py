@@ -3,16 +3,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
 from first_rag.config import settings
-from langchain_openai import ChatOpenAI
-import os
-import shutil
-
-llm = ChatOpenAI(model="gpt-4o", api_key=settings.OPENAI_API_KEY)
-
-def generate_response(text: str):
-    messages = [{"role": "user", "content": text}]
-    response = llm.invoke(messages)
-    return response.content
 
 def load_documents(data_path):
     document_loader = PyPDFLoader(data_path)
@@ -34,14 +24,12 @@ def save_to_chroma(chunks, chroma_path):
     batch_size = 100
     total_chunks = len(chunks)
     
-    # Initialize the Chroma database with the first batch
     db = Chroma.from_documents(
         chunks[:batch_size],
         OpenAIEmbeddings(api_key=settings.OPENAI_API_KEY),
         persist_directory=chroma_path
     )
     
-    # Process remaining chunks in batches
     for i in range(batch_size, total_chunks, batch_size):
         batch = chunks[i:i+batch_size]
         db.add_documents(batch)
