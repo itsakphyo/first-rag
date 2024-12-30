@@ -50,6 +50,14 @@ if st.sidebar.button("Create Vector Database"):
 
             st.sidebar.success(f"Vector database '{db_name}' created successfully!")
 
+old_dbs = [db for db in os.listdir("data/database")]
+old_db_name = st.sidebar.selectbox("Use Old Vector Database", old_dbs) 
+
+if st.sidebar.button("Select Vector Database"):
+    st.session_state.db_path = f"data/database/{old_db_name}"
+    # st.session_state['messages'] = []
+    st.sidebar.success(f"Using old vector database '{old_db_name}'.")
+
 if 'messages' not in st.session_state:
     st.session_state['messages'] = []
 
