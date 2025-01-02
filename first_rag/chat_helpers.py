@@ -15,10 +15,13 @@ Answer the question based on the above context: {question} and chat history: {hi
 prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
 
 
-def generate_response(text: str, history ,db_path: str | None = None) -> str:
+def generate_response(text: str, history ,db_path: str | None = None):
     if not db_path:
         messages = [{"role": "user", "content": text}]
-        return llm.invoke(messages).content
+        response = ""
+        for chunk in llm.stream(messages):
+            response = chunk.content
+            yield response
     else:
         embeddings = OpenAIEmbeddings(api_key=settings.OPENAI_API_KEY)
 
@@ -30,7 +33,9 @@ def generate_response(text: str, history ,db_path: str | None = None) -> str:
 
         prompt = prompt_template.format(context=context_text, question=text, history=history)
 
-        response_text = llm.invoke(prompt)
+        response = ""
 
-        return response_text.content
+        for chunk in llm.stream(prompt):
+            response = chunk.content
+            yield response
 

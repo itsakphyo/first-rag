@@ -55,8 +55,13 @@ old_db_name = st.sidebar.selectbox("Use Old Vector Database", old_dbs)
 
 if st.sidebar.button("Select Vector Database"):
     st.session_state.db_path = f"data/database/{old_db_name}"
-    # st.session_state['messages'] = []
+    st.session_state['messages'] = []
     st.sidebar.success(f"Using old vector database '{old_db_name}'.")
+
+if st.sidebar.button("Stop Using Vector Database"):
+    st.session_state.db_path = None
+    st.session_state['messages'] = []
+    st.sidebar.success(f"Stopped using vector database.")
 
 if 'messages' not in st.session_state:
     st.session_state['messages'] = []
@@ -70,9 +75,14 @@ if prompt := st.chat_input("Enter your query"):
     with st.chat_message('user'):
         st.markdown(prompt)
 
-    response = generate_response(prompt, db_path=st.session_state.db_path, history=st.session_state['messages'])
+    response_stream = generate_response(prompt, db_path=st.session_state.db_path, history=st.session_state['messages'])
 
-    with st.chat_message('assistant'):
-        st.markdown(response)
+    assistant_message = st.chat_message('assistant')
+    placeholder = assistant_message.empty()
+    response_text = ""
 
-    st.session_state['messages'].append({"role": "assistant", "content": response})
+    for partial_response in response_stream:
+        response_text += partial_response  
+        placeholder.markdown(response_text)  
+
+    st.session_state['messages'].append({"role": "assistant", "content": response_text})
