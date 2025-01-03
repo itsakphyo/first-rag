@@ -18,7 +18,6 @@ prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
 def generate_response(text: str, history ,db_path: str | None = None):
     if not db_path:
         messages = [{"role": "user", "content": text}]
-        response = ""
         for chunk in llm.stream(messages):
             response = chunk.content
             yield response
@@ -32,8 +31,6 @@ def generate_response(text: str, history ,db_path: str | None = None):
         context_text = "\n\n - -\n\n".join([doc.page_content for doc, _score in results])
 
         prompt = prompt_template.format(context=context_text, question=text, history=history)
-
-        response = ""
 
         for chunk in llm.stream(prompt):
             response = chunk.content
