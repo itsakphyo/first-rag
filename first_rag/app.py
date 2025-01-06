@@ -7,7 +7,7 @@ import os
 st.title('Chat with your PDF')
 st.sidebar.title("Vector Database Configuration")
 
-uploaded_files = st.sidebar.file_uploader("Upload Documents", accept_multiple_files=True, type=["txt", "pdf"])
+uploaded_files = st.sidebar.file_uploader("Upload Documents", accept_multiple_files=True, type=[ "txt", "pdf"])
 
 db_name = st.sidebar.text_input("Database Name", value="default_db")
 chunk_size = st.sidebar.text_input("Chunk Size", value="500")
@@ -15,6 +15,9 @@ chunk_overlap = st.sidebar.text_input("Chunk Overlap", value="50")
 
 if 'db_path' not in st.session_state:
     st.session_state.db_path = None
+
+if 'messages' not in st.session_state:
+    st.session_state['messages'] = []
 
 if st.sidebar.button("Create Vector Database"):
     st.session_state.db_path = f"data/database/{db_name}"
@@ -47,7 +50,7 @@ if st.sidebar.button("Create Vector Database"):
             for file_name in os.listdir("data/raw"):
                 file_path = f"data/raw/{file_name}"
                 generate_data_store(file_path, chunk_size, chunk_overlap, db_path)
-
+            st.session_state['messages'] = []
             st.sidebar.success(f"Vector database '{db_name}' created successfully!")
 
 old_dbs = [db for db in os.listdir("data/database")]
@@ -62,9 +65,6 @@ if st.sidebar.button("Stop Using Vector Database"):
     st.session_state.db_path = None
     st.session_state['messages'] = []
     st.sidebar.success(f"Stopped using vector database.")
-
-if 'messages' not in st.session_state:
-    st.session_state['messages'] = []
 
 for message in st.session_state['messages']:
     with st.chat_message(message['role']):
