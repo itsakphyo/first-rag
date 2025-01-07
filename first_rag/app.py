@@ -8,6 +8,7 @@ st.title('Chat with your PDF')
 st.sidebar.title("Vector Database Configuration")
 
 uploaded_files = st.sidebar.file_uploader("Upload Documents", accept_multiple_files=True, type=[ "txt", "pdf"])
+# yt_link = st.sidebar.text_input("YouTube URL")
 
 db_name = st.sidebar.text_input("Database Name", value="default_db")
 chunk_size = st.sidebar.text_input("Chunk Size", value="500")
